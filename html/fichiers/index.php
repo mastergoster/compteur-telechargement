@@ -1,8 +1,8 @@
 <?php
 session_start();
-var_dump($_GET["csrf"]);
-var_dump($_SESSION["csrf"]);
-var_dump($_SESSION["csrf"]);
+//var_dump($_GET["csrf"]);
+//var_dump($_SESSION["csrf"]);
+//var_dump($_SESSION["csrf"]);
 //test si lutilisateur est connect ou autorisé
 try {
     $pdo = new PDO('sqlite:' . dirname(__FILE__) . '/database.sqlite');
@@ -18,9 +18,14 @@ $pdo->query("CREATE TABLE IF NOT EXISTS compteur (
     nombre VARCHAR( 250 )
 );");
 $urlresult = explode("/", $_GET["url"]);
-var_dump($urlresult);
+if ($urlresult[0] != $_SESSION["csrf"]) {
+    header("Location: http://localhost");
+
+    exit();
+}
+//var_dump($urlresult);
 //die();
-if (isset($_GET["url"]) && !empty($_GET["url"]) && file_exists(__DIR__ . '/ftp_files/' . end($urlresult))) {
+if (isset($_GET["url"]) && !empty($_GET["url"]) && file_exists(dirname(dirname(__DIR__)) . '/ftp_files/' . end($urlresult))) {
 
     $fichier = explode(".", end($urlresult));
     if ($fichier[1] == "pdf") {
@@ -39,7 +44,7 @@ if (isset($_GET["url"]) && !empty($_GET["url"]) && file_exists(__DIR__ . '/ftp_f
 
         header('Content-Type: application/pdf');
 
-        echo file_get_contents(__DIR__ . '/ftp_files/' . end($urlresult));
+        echo file_get_contents(dirname(dirname(__DIR__)) . '/ftp_files/' . end($urlresult));
         exit;
     }
 }
